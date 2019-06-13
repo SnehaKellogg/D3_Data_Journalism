@@ -23,27 +23,23 @@ var chartGroup = svg.append("g")
 // Import Data
 d3.csv("/assets/data/data.csv")
   .then(function(myData) {
-    console.log(myData[0]);
+console.log(myData[0])
     // Step 1: Parse Data/Cast as numbers
     // ==============================
     myData.forEach(function(data) {
-        data.age = +data.age;
-        data.income = +data.income;
-        data.poverty = +data.poverty;
-        data.smokes = +data.smokes;
-        data.healthcare = +data.healthcare;
-        data.obesity = +data.obesity;
+      data.poverty = +data.poverty;
+      data.healthcare = +data.healthcare;
+      data.age = +data.age;
+      data.income = +data.income;
+      data.smokes = +data.smokes;
     });
-    // var chosenXAxis = "";
-// function xScale(myData, chosenXAxis){
+
     // Step 2: Create scale functions
     // ==============================
     var xLinearScale = d3.scaleLinear()
-      .domain([d3.min(myData, d => d[xLinearScale])* 0.8,
-      d3.max(myData,d => d[xLinearScale])* 1.2])
+      .domain([d3.min(myData, d => d.poverty)* 0.8,
+      d3.max(myData, d => d.poverty)* 1.2])
       .range([0, width]);
-    //   return xLinearScale;
-// }
 
     var yLinearScale = d3.scaleLinear()
       .domain([0, d3.max(myData, d => d.healthcare)])
@@ -52,25 +48,7 @@ d3.csv("/assets/data/data.csv")
     // Step 3: Create axis functions
     // ==============================
     var bottomAxis = d3.axisBottom(xLinearScale);
-
-    // var bottomAxis = d3.axisBottom(chosenXAxis);
     var leftAxis = d3.axisLeft(yLinearScale);
-    
-    // // Initialize tool tip
-    // // =========================
-    // function updateToolTip(chosenXAxis, circlesGroup) {
-    //     if (chosenXAxis === "smokes") {
-    //       var label = "Smokers: ";
-    //     }
-    //     else if 
-    //       (chosenXAxis === "healthcare"){
-    //       var label = "Healthcare:";
-    //       }
-    //     else if
-    //     (chosenXAxis === "obesity"){
-    //       var label = "Obese:";
-    //       }
-    //      };
 
     // Step 4: Append Axes to the chart
     // ==============================
@@ -81,33 +59,27 @@ d3.csv("/assets/data/data.csv")
     chartGroup.append("g")
       .call(leftAxis);
 
-    var toolTip = d3.tip()
-      .attr("class", "d3-tip")
-      .offset([80, -60])
-      .html(function(d) {
-        // return (`${d.state}<br>${label}: ${d.chosenXAxis}<br>Healthcare: ${d.healthcare}`);
-        return (`${d.state}<br>Poverty: ${d.poverty}%<br>Healthcare: ${d.healthcare}%`);
-      });
-// svg.call(toolTip);  
-
     // Step 5: Create Circles
     // ==============================
     var circlesGroup = chartGroup.selectAll("circle")
     .data(myData)
     .enter()
     .append("circle")
-    // .attr("class") //,("statecircle")
     .attr("cx", d => xLinearScale(d.poverty))
     .attr("cy", d => yLinearScale(d.healthcare))
-    .attr("r", "8")
+    .attr("r", "6")
     .attr("fill", "blue")
     .attr("opacity", ".7");
-    
-    
-    // circlesGroup.on('mouseover', toolTip.show)
-    // .on('mouseout', toolTip.hide);
 
-   
+    // Step 6: Initialize tool tip
+    // ==============================
+    var toolTip = d3.tip()
+      .attr("class", "tooltip")
+      .offset([80, -60])
+      .attr("color", "black")
+      .html(function(d) {
+        return (`${d.state}<br>Poverty: ${d.poverty}<br>Healthcare: ${d.healthcare}`);
+      });
 
     // Step 7: Create tooltip in the chart
     // ==============================
@@ -117,9 +89,10 @@ d3.csv("/assets/data/data.csv")
     // ==============================
     circlesGroup.on("mouseover", function(data) {
       toolTip.show(data, this);
+      toolTip.style("display", "block");
     })
       // onmouseout event
-      .on("mouseout", function(data) {
+      .on("mouseout", function(data, index) {
         toolTip.hide(data);
       });
 
@@ -129,11 +102,11 @@ d3.csv("/assets/data/data.csv")
       .attr("y", 0 - margin.left + 40)
       .attr("x", 0 - (height / 2))
       .attr("dy", "1em")
-      .attr("class", "axisText")
-      .text("Healthcare (in %) ");
+      .attr("axisText", true)
+      .text("Poverty (in %)");
 
     chartGroup.append("text")
       .attr("transform", `translate(${width / 2}, ${height + margin.top + 30})`)
-      .attr("class", "axisText")
-      .text("Poverty (in %)");
+      .attr("axisText", true)
+      .text("Lacks Healthcare (%)");
   });
