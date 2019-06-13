@@ -88,11 +88,11 @@ console.log(myData[0])
     // Step 6: Initialize tool tip
     // ==============================
     var toolTip = d3.tip()
-      .attr("class", "tooltip")
+      .attr("class", "d3-tip")
       .offset([80, -60])
       .attr("color", "black")
       .html(function(d) {
-        return (`${d.state}<br>Poverty: ${d.poverty}<br>Healthcare: ${d.healthcare}`);
+        return (`<strong>${d.state}</strong><br>Poverty: ${d.poverty}<br>Healthcare: ${d.healthcare}`);
       });
 
     // Step 7: Create tooltip in the chart
